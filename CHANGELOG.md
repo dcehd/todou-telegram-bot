@@ -41,3 +41,9 @@ All notable changes to this project will be documented in this file.
 - Added input validation for the task limit feature.
 - Refactored task handling logic to integrate batch size functionality.
 
+## [1.5.0] - Minor Improvements and Fixes - 2024-12-18
+
+---
+- Improved feedback in the console for debugging.
+- Optimized task display logic to prevent duplicate displays.
+- Added file saving for completed tasks after each update.
