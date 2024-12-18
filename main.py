@@ -1,6 +1,8 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 from decouple import config
+import json
+import os
 
 task_list = [
     "Task 1: This is a sample task.",
@@ -12,8 +14,15 @@ task_list = [
     "Task 7: A task you have to do today!",
 ]
 
-not_completed = task_list[:]
-completed = []
+# Load completed items (persistent storage)
+if os.path.exists("completed_tasks.json"):
+    with open("completed_tasks.json", 'r') as file:
+        completed = json.load(file)
+else:
+    completed = []
+
+# Filter `not_completed` to exclude completed tasks
+not_completed = [task for task in task_list if task not in completed]
 current_batch = []
 
 
@@ -56,11 +65,18 @@ async def click_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     task = query.data.split("_", 1)[1]
 
     if task:
+        # Remove the task from current_batch
         if task in current_batch:
             current_batch.remove(task)
+        # Remove the task from not_completed
         if task in not_completed:
             not_completed.remove(task)
+        # Add it to the completed list
         completed.append(task)
+
+        # Save the completed list
+        with open("completed_tasks.json", "w") as f:
+            json.dump(completed, f, indent=4)
 
     # show this once a task is done
     await query.edit_message_text("Completed ✅")
