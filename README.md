@@ -29,3 +29,9 @@ TODOU is an effective task management bot for Telegram. It helps users organize 
 1. Start the bot with /start. 
 2. Enter the number of tasks you'd like to view (1-10) or type "all" to see all remaining tasks. 
 3. Mark tasks as completed using the "Done" button.
+
+## Customization
+
+---
+- Task List: Edit the task_list variable in the code to include your tasks. 
+- Persistent Storage: The bot uses completed_tasks.json to save completed tasks. Delete this file to reset the progress.
