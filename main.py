@@ -8,6 +8,8 @@ task_list = [
     "Task 3: Yet another sample task.",
     "Task 4: Mock task to test the bot.",
     "Task 5: Testing the task list feature.",
+    "Task 6: Another sample task.",
+    "Task 7: A task you have to do today!",
 ]
 
 not_completed = task_list[:]
@@ -18,15 +20,20 @@ current_batch = []
 # /start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global current_batch
-    if not current_batch:
-        await update.message.reply_text("Insert welcome message from TODOU")
+    # If not_completed has tasks, load... if not congratulate me :)
+    if not_completed:
+        if not current_batch:
+            await update.message.reply_text("Insert welcome message from TODOU")
 
-        current_batch = not_completed[:3]
+            current_batch = not_completed[:3]
 
-        await send_tasks(update)
+            await send_tasks(update)
+        else:
+            # send tasks
+            await send_tasks(update)
     else:
-        # send tasks
-        await send_tasks(update)
+        await update.message.reply_text("Finished ALL tasks!!! 🎉")
+        return
 
 
 # send tasks
