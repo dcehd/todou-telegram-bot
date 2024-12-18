@@ -7,7 +7,7 @@ task_list = [
     "Task 2: Another sample task.",
     "Task 3: Yet another sample task.",
     "Task 4: Mock task to test the bot.",
-    "Task 5: Testing the task list feature."
+    "Task 5: Testing the task list feature.",
 ]
 
 not_completed = task_list[:]
@@ -18,16 +18,22 @@ current_batch = []
 # /start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global current_batch
-    await update.message.reply_text("Insert welcome message from TODOU")
+    if not current_batch:
+        await update.message.reply_text("Insert welcome message from TODOU")
 
-    await send_tasks(update)
+        current_batch = not_completed[:3]
+
+        await send_tasks(update)
+    else:
+        # send tasks
+        await send_tasks(update)
 
 
 # send tasks
 async def send_tasks(update: Update):
     global current_batch
-    current_batch = not_completed[:3]
 
+    # cue the task with a "Done" button
     for task in current_batch:
         keyboard = [[InlineKeyboardButton("Done", callback_data=f"done_{task}")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -42,17 +48,23 @@ async def click_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     task = query.data.split("_", 1)[1]
 
-    if task in current_batch:
-        current_batch.remove(task)
-    if task in not_completed:
-        not_completed.remove(task)
+    if task:
+        if task in current_batch:
+            current_batch.remove(task)
+        if task in not_completed:
+            not_completed.remove(task)
         completed.append(task)
 
+    # show this once a task is done
     await query.edit_message_text("Completed ✅")
+
+    # show this once that set is complete
+    if not current_batch:
+        await query.message.reply_text("All done with this set 🎉")
 
     # this is for my feedback, so I can see the effect in real time
     print("--------------------------------------------")
-    print(f" First batch - {current_batch[:3]}")
+    print(f" Current batch - {current_batch[:3]}")
     print("--------------------------------------------")
     print(f" Not completed - {not_completed[:3]}")
     print("--------------------------------------------")
