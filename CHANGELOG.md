@@ -32,3 +32,12 @@ All notable changes to this project will be documented in this file.
 - Implemented persistence for completed tasks using `completed_tasks.json`.
 - Ensured tasks marked as complete are not displayed again.
 - Added dynamic filtering of tasks based on completed status.
+
+## [1.4.0] - Custom Task Batch Size - 2024-12-17
+
+---
+- Introduced user input to customize the number of tasks displayed per batch.
+  - Allowed inputs: numbers (1-10) and "all".
+- Added input validation for the task limit feature.
+- Refactored task handling logic to integrate batch size functionality.
+
