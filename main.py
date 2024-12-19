@@ -1,8 +1,9 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler, filters
 from decouple import config
 import json
 import os
+
 
 task_list = [
     "Task 1: This is a sample task.",
@@ -24,6 +25,7 @@ else:
 # Filter `not_completed` to exclude completed tasks
 not_completed = [task for task in task_list if task not in completed]
 current_batch = []
+task_limit = 3  # Default task limit
 
 
 # /start command
@@ -32,9 +34,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # If not_completed has tasks, load... if not congratulate me :)
     if not_completed:
         if not current_batch:
-            await update.message.reply_text("Insert welcome message from TODOU")
-
-            current_batch = not_completed[:3]
+            await update.message.reply_text("Yo, I'm TODOU")
+            await update.message.reply_text("Here to help you organize your activities")
+            await update.message.reply_text("Daniel-same made me")
+            await update.message.reply_text("Type a number between 1-10 or 'all' to see all tasks.")
 
             await send_tasks(update)
         else:
@@ -43,6 +46,31 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else:
         await update.message.reply_text("Finished ALL tasks!!! 🎉")
         return
+
+
+# Input handler for number of tasks
+async def handle_task_limit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    global task_limit, current_batch, not_completed
+    user_input = update.message.text.strip().lower()
+
+    if user_input == "all":
+        task_limit = len(not_completed)
+    else:
+        try:
+            task_limit = int(user_input)
+            if task_limit < 1 or task_limit > 10:
+                raise ValueError
+        except ValueError:
+            await update.message.reply_text(
+                "Please enter a valid number between 1-10 or type 'all'."
+            )
+            return
+
+    # Update the current batch
+    current_batch = not_completed[:task_limit]
+
+    # Send tasks
+    await send_tasks(update)
 
 
 # send tasks
@@ -103,6 +131,7 @@ def main():
     # add handlers
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(click_button, pattern="^done_"))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_task_limit))
 
     #  Run the bot
     application.run_polling()
